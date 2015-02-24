@@ -16,6 +16,9 @@ module Mastermind
 
         PEGS[letter]
       end
+      unless pegs.length == 4
+        raise ArgumentError.new
+      end
 
       Code.new(pegs)
     end
@@ -103,11 +106,13 @@ module Mastermind
     private
 
     def get_guess
-      puts "Guess the code:"
-
       begin
+        puts "Guess the code:"
         Code.parse(gets.chomp)
-      rescue
+      rescue ArgumentError => e
+        puts "Wrong guess length"
+        retry
+      rescue => e
         puts "Error parsing code!"
         retry
       end
