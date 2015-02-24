@@ -66,7 +66,7 @@ class HumanPlayer
     puts "Think of a secret word; how long is it?"
 
     begin
-      Integer(gets.chomp)
+      @length = Integer(gets.chomp)
     rescue ArgumentError
       puts "Enter a valid length!"
       retry
@@ -74,11 +74,20 @@ class HumanPlayer
   end
 
   def check_guess(guess)
-    puts "Player guessed #{guess}"
-    puts "What positions does that occur at?"
-
-    # didn't check for bogus input here; got lazy :-)
-    positions = gets.chomp.split(",").map { |i_str| Integer(i_str) }
+    begin
+      puts "Player guessed #{guess}"
+      puts "What positions does that occur at?"
+      positions = gets.chomp.split(",").map { |i_str| Integer(i_str) }
+      unless positions.all? { |pos| (0...@length).include?(pos) }
+        raise OutOfBoundsError.new
+      end
+    rescue OutOfBoundsError
+      puts "Position not within length of word"
+      retry
+    rescue ArgumentError
+      puts "Enter integers separated by a comma."
+      retry
+    end
   end
 
   def require_secret
@@ -168,6 +177,9 @@ class ComputerPlayer
 
     freq_table
   end
+end
+
+class OutOfBoundsError < ArgumentError
 end
 
 if __FILE__ == $PROGRAM_NAME
